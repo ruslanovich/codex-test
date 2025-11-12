@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist/node",
+    "tsBuildInfoFile": "./node_modules/.tsbuildinfo.tsconfig.node"
   },
   "include": ["vite.config.ts"]
 }
