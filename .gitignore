@@ -9,5 +9,3 @@ pnpm-lock.yaml
 coverage/
 frontend/node_modules/
 backend/node_modules/
-*.tsbuildinfo
-frontend/vite.config.*
