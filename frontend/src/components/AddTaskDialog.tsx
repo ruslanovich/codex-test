@@ -1,5 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import './AddTaskDialog.css';
 import type { TaskPriority, TaskStatus } from '../types.js';
 
@@ -19,6 +19,7 @@ export interface AddTaskDialogProps {
   onSubmit: (values: AddTaskDialogValues) => void;
   initialValues?: Partial<AddTaskDialogValues>;
   submitLabel?: string;
+  title?: string;
 }
 
 const DEFAULT_VALUES: AddTaskDialogValues = {
@@ -37,12 +38,20 @@ const parseTags = (value: string): string[] =>
     .map((tag) => tag.trim())
     .filter(Boolean);
 
+const formatDateInput = (value?: string) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+};
+
 export function AddTaskDialog({
   open,
   onClose,
   onSubmit,
   initialValues,
   submitLabel = 'Add task',
+  title = 'Add Task',
 }: AddTaskDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
@@ -56,17 +65,26 @@ export function AddTaskDialog({
     () => ({
       ...DEFAULT_VALUES,
       ...initialValues,
+      dueDate:
+        typeof initialValues?.dueDate === 'string' && initialValues.dueDate
+          ? formatDateInput(initialValues.dueDate)
+          : initialValues?.dueDate ?? DEFAULT_VALUES.dueDate,
       tags: [...(initialValues?.tags ?? DEFAULT_VALUES.tags)],
     }),
     [initialValues],
   );
 
-  const [formValues, setFormValues] = useState<AddTaskDialogValues>(
-    resolvedInitialValues,
-  );
-  const [tagsInput, setTagsInput] = useState<string>(() =>
-    resolvedInitialValues.tags.join(', '),
-  );
+  const [formValues, setFormValues] = useState<AddTaskDialogValues>(resolvedInitialValues);
+  const [tagsInput, setTagsInput] = useState<string>(() => resolvedInitialValues.tags.join(', '));
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setFormValues(resolvedInitialValues);
+    setTagsInput(resolvedInitialValues.tags.join(', '));
+  }, [open, resolvedInitialValues]);
 
   const handleChange = <Field extends keyof AddTaskDialogValues>(
     field: Field,
@@ -122,7 +140,7 @@ export function AddTaskDialog({
   return (
     <div className="add-task-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId}>
       <div className="add-task-dialog__content">
-        <h2 id={titleId}>Add Task</h2>
+        <h2 id={titleId}>{title}</h2>
         <form onSubmit={handleSubmit}>
           <div className="add-task-dialog__field">
             <label htmlFor={`${titleId}-input`}>Title</label>

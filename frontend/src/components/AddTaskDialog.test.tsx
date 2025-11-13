@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { AddTaskDialog, type AddTaskDialogProps } from './AddTaskDialog.js';
+import { setupUser } from '../test/setupUser.js';
 
 const renderAddTaskDialog = (overrideProps: Partial<AddTaskDialogProps> = {}) => {
   const defaultOnClose = vi.fn();
@@ -15,7 +15,7 @@ const renderAddTaskDialog = (overrideProps: Partial<AddTaskDialogProps> = {}) =>
     ...overrideProps,
   };
 
-  const user = userEvent.setup();
+  const user = setupUser();
   const renderResult = render(<AddTaskDialog {...props} />);
 
   return {
@@ -49,17 +49,25 @@ describe('AddTaskDialog', () => {
     const onSubmit = vi.fn();
     const { user, onClose } = renderAddTaskDialog({ onSubmit });
 
-    await user.clear(screen.getByLabelText('Title'));
-    await user.type(screen.getByLabelText('Title'), '  Prototype ideas  ');
-    await user.type(screen.getByLabelText('Description'), 'Build wireframes');
-    await user.type(screen.getByLabelText('Assignee'), 'Jordan');
-    await user.selectOptions(screen.getByLabelText('Status'), ['IN_PROGRESS']);
-    await user.selectOptions(screen.getByLabelText('Priority'), ['HIGH']);
-    await user.type(screen.getByLabelText('Due date'), '2024-04-12');
-    await user.clear(screen.getByLabelText('Tags'));
-    await user.type(screen.getByLabelText('Tags'), ' ui , design ');
+    const titleInput = screen.getByLabelText('Title');
+    const descriptionInput = screen.getByLabelText('Description');
+    const assigneeInput = screen.getByLabelText('Assignee');
+    const statusSelect = screen.getByLabelText('Status');
+    const prioritySelect = screen.getByLabelText('Priority');
+    const dueDateInput = screen.getByLabelText('Due date');
+    const tagsInput = screen.getByLabelText('Tags');
+    const submitButton = screen.getByRole('button', { name: 'Add task' });
 
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
+    await user.clear(titleInput);
+    await user.type(titleInput, '  Prototype ideas  ');
+    await user.type(descriptionInput, 'Build wireframes');
+    await user.type(assigneeInput, 'Jordan');
+    await user.selectOptions(statusSelect, ['IN_PROGRESS']);
+    await user.selectOptions(prioritySelect, ['HIGH']);
+    await user.type(dueDateInput, '2024-04-12');
+    await user.clear(tagsInput);
+    await user.type(tagsInput, ' ui , design ');
+    await user.click(submitButton);
 
     expect(onSubmit).toHaveBeenCalledWith({
       title: 'Prototype ideas',

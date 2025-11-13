@@ -1,3 +1,4 @@
+import { persistStoredTheme } from '../utils/themePreference.js';
 import './ThemeToggle.css';
 
 interface ThemeToggleProps {
@@ -9,7 +10,7 @@ export function ThemeToggle({ value, onChange }: ThemeToggleProps) {
   const toggle = () => {
     const next = value === 'light' ? 'dark' : 'light';
     onChange(next);
-    localStorage.setItem('task-board-theme', next);
+    persistStoredTheme(next);
   };
 
   return (

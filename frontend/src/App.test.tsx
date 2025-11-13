@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import App from './App.js';
+import { setupUser } from './test/setupUser.js';
 
 const createJsonResponse = (data: unknown, init: ResponseInit = {}) => {
   const headers = new Headers(init.headers ?? {});
@@ -41,7 +41,7 @@ const createWrapper = () => {
     },
   });
 
-  const user = userEvent.setup();
+  const user = setupUser();
   const renderResult = render(
     <QueryClientProvider client={queryClient}>
       <App />
@@ -110,6 +110,54 @@ describe('App', () => {
       status: 'TODO',
       priority: 'MEDIUM',
       tags: [],
+    });
+  });
+
+  it('opens the edit dialog and submits task updates', async () => {
+    const updatedTask = {
+      ...exampleTask,
+      title: 'Updated title',
+    };
+
+    fetchMock
+      .mockResolvedValueOnce(createJsonResponse([exampleTask]))
+      .mockResolvedValueOnce(createJsonResponse(updatedTask))
+      .mockResolvedValueOnce(createJsonResponse([updatedTask]));
+
+    const { user } = createWrapper();
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    const taskCard = await screen.findByRole('article', {
+      name: `Task ${exampleTask.title}`,
+    });
+
+    const editButton = within(taskCard).getByRole('button', {
+      name: new RegExp(`Edit task "${exampleTask.title}"`, 'i'),
+    });
+
+    await user.click(editButton);
+
+    const dialog = await screen.findByRole('dialog');
+    const titleInput = within(dialog).getByLabelText('Title');
+    await user.clear(titleInput);
+    await user.type(titleInput, 'Updated title');
+
+    const submitButton = within(dialog).getByRole('button', { name: /save changes/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.some(([, init]) => init?.method === 'PUT'),
+      ).toBe(true);
+    });
+
+    const putCall = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT');
+    expect(putCall?.[0]).toBe(`/api/tasks/${exampleTask.id}`);
+    expect(JSON.parse((putCall?.[1] as RequestInit).body as string)).toMatchObject({
+      title: 'Updated title',
+      status: exampleTask.status,
+      priority: exampleTask.priority,
     });
   });
 

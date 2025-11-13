@@ -10,10 +10,11 @@ function getInitials(name?: string) {
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
+  onEdit: (task: Task) => void;
   isDeleting?: boolean;
 }
 
-export function TaskCard({ task, onDelete, isDeleting }: TaskCardProps) {
+export function TaskCard({ task, onDelete, onEdit, isDeleting }: TaskCardProps) {
   const handleDelete = () => {
     if (isDeleting) return;
 
@@ -21,6 +22,10 @@ export function TaskCard({ task, onDelete, isDeleting }: TaskCardProps) {
     if (!confirmed) return;
 
     onDelete(task.id);
+  };
+
+  const handleEdit = () => {
+    onEdit(task);
   };
 
   return (
@@ -32,7 +37,16 @@ export function TaskCard({ task, onDelete, isDeleting }: TaskCardProps) {
         <div className="task-card__header-actions">
           <button
             type="button"
-            className="task-card__delete"
+            className="task-card__action task-card__action--primary"
+            onClick={handleEdit}
+            aria-label={`Edit task "${task.title}"`}
+            title={`Edit task "${task.title}"`}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="task-card__action task-card__action--danger"
             onClick={handleDelete}
             disabled={isDeleting}
             aria-label={`Delete task "${task.title}"`}

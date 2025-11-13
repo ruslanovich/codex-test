@@ -63,7 +63,7 @@
   font-weight: 600;
 }
 
-.task-card__delete {
+.task-card__action {
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -76,21 +76,34 @@
   align-items: center;
   gap: 0.35rem;
 }
+.task-card__action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-.task-card__delete:hover:not(:disabled),
-.task-card__delete:focus-visible {
+.task-card__action--primary:hover:not(:disabled),
+.task-card__action--primary:focus-visible {
+  background: rgba(59, 130, 246, 0.15);
+  color: #1d4ed8;
+}
+
+.task-card__action--danger:hover:not(:disabled),
+.task-card__action--danger:focus-visible {
   background: rgba(248, 113, 113, 0.15);
   color: #b91c1c;
 }
 
-.task-card__delete:focus-visible {
-  outline: 2px solid rgba(248, 113, 113, 0.5);
+.task-card__action--primary:focus-visible,
+.task-card__action--danger:focus-visible {
   outline-offset: 2px;
 }
 
-.task-card__delete:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.task-card__action--primary:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.4);
+}
+
+.task-card__action--danger:focus-visible {
+  outline: 2px solid rgba(248, 113, 113, 0.5);
 }
 
 .task-card__spinner {

@@ -39,6 +39,57 @@ describe('Task routes', () => {
     expect(task.title).toBe('Write tests');
   });
 
+  it('updates a task via PUT and allows clearing fields', async () => {
+    const server = await setup();
+    const createResponse = await server.inject({
+      method: 'POST',
+      url: '/api/tasks',
+      payload: {
+        title: 'Task to update',
+        description: 'Temporary description',
+        status: 'TODO',
+        assignee: 'Jordan',
+      },
+    });
+
+    expect(createResponse.statusCode).toBe(201);
+    const created = createResponse.json();
+
+    const updateResponse = await server.inject({
+      method: 'PUT',
+      url: `/api/tasks/${created.id}`,
+      payload: {
+        title: 'Updated task',
+        description: 'Edited copy',
+        assignee: 'Sam',
+        priority: 'HIGH',
+      },
+    });
+
+    expect(updateResponse.statusCode).toBe(200);
+    const updated = updateResponse.json();
+    expect(updated.title).toBe('Updated task');
+    expect(updated.description).toBe('Edited copy');
+    expect(updated.assignee).toBe('Sam');
+    expect(updated.priority).toBe('HIGH');
+
+    const clearResponse = await server.inject({
+      method: 'PUT',
+      url: `/api/tasks/${created.id}`,
+      payload: {
+        description: null,
+        assignee: null,
+        dueDate: null,
+      },
+    });
+
+    expect(clearResponse.statusCode).toBe(200);
+    const cleared = clearResponse.json();
+    expect('description' in cleared).toBe(false);
+    expect('assignee' in cleared).toBe(false);
+    expect('dueDate' in cleared).toBe(false);
+  });
+
   it('deletes a task and prevents further access', async () => {
     const server = await setup();
 
@@ -79,6 +130,17 @@ describe('Task routes', () => {
   it('returns 404 for unknown task', async () => {
     const server = await setup();
     const response = await server.inject({ method: 'GET', url: '/api/tasks/nonexistent' });
+    expect(response.statusCode).toBe(404);
+  });
+
+  it('returns 404 when updating a missing task', async () => {
+    const server = await setup();
+    const response = await server.inject({
+      method: 'PUT',
+      url: '/api/tasks/missing',
+      payload: { title: 'Still missing' },
+    });
+
     expect(response.statusCode).toBe(404);
   });
 });

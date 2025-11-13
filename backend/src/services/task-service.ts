@@ -68,6 +68,9 @@ export class TaskService {
       throw new Error('Task not found');
     }
 
+    const hasProp = <K extends keyof UpdateTaskInput>(key: K) =>
+      Object.prototype.hasOwnProperty.call(input, key);
+
     const nextStatus = input.status ?? task.status;
     if (nextStatus !== task.status) {
       this.reindexColumn(task.status, id);
@@ -79,11 +82,23 @@ export class TaskService {
       this.reposition(task, input.order);
     }
 
-    task.title = input.title ?? task.title;
-    task.description = input.description ?? task.description;
+    if (input.title !== undefined) {
+      task.title = input.title;
+    }
+
+    if (hasProp('description')) {
+      task.description = input.description ?? undefined;
+    }
+
     task.priority = input.priority ?? task.priority;
-    task.assignee = input.assignee ?? task.assignee;
-    task.dueDate = input.dueDate ?? task.dueDate;
+    if (hasProp('assignee')) {
+      task.assignee = input.assignee ?? undefined;
+    }
+
+    if (hasProp('dueDate')) {
+      task.dueDate = input.dueDate ?? undefined;
+    }
+
     task.tags = input.tags ?? task.tags;
     task.archived = input.archived ?? task.archived;
     task.updatedAt = new Date().toISOString();

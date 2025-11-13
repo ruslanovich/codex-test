@@ -27,8 +27,13 @@ export interface CreateTaskInput {
   archived?: boolean;
 }
 
-export interface UpdateTaskInput extends Partial<CreateTaskInput> {
+export type UpdateTaskInput = Partial<
+  Omit<CreateTaskInput, 'description' | 'assignee' | 'dueDate'>
+> & {
   status?: TaskStatus;
   priority?: TaskPriority;
   order?: number;
-}
+  description?: string | null;
+  assignee?: string | null;
+  dueDate?: string | null;
+};
