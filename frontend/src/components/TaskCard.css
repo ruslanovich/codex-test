@@ -25,6 +25,12 @@
   font-size: 0.85rem;
 }
 
+.task-card__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .task-card__priority {
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
@@ -55,6 +61,27 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
+}
+
+.task-card__delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.task-card__delete:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
+}
+
+.task-card__delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .task-card__title {
