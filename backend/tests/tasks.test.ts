@@ -39,6 +39,43 @@ describe('Task routes', () => {
     expect(task.title).toBe('Write tests');
   });
 
+  it('deletes a task and prevents further access', async () => {
+    const server = await setup();
+
+    const createResponse = await server.inject({
+      method: 'POST',
+      url: '/api/tasks',
+      payload: {
+        title: 'Temporary task',
+        description: 'Task that will be removed',
+        status: 'TODO',
+      },
+    });
+
+    expect(createResponse.statusCode).toBe(201);
+    const created = createResponse.json();
+
+    const deleteResponse = await server.inject({
+      method: 'DELETE',
+      url: `/api/tasks/${created.id}`,
+    });
+
+    expect(deleteResponse.statusCode).toBe(204);
+
+    const getResponse = await server.inject({
+      method: 'GET',
+      url: `/api/tasks/${created.id}`,
+    });
+
+    expect(getResponse.statusCode).toBe(404);
+
+    const listResponse = await server.inject({ method: 'GET', url: '/api/tasks' });
+    expect(listResponse.statusCode).toBe(200);
+    const tasks = listResponse.json();
+    expect(Array.isArray(tasks)).toBe(true);
+    expect(tasks.some((task: { id: string }) => task.id === created.id)).toBe(false);
+  });
+
   it('returns 404 for unknown task', async () => {
     const server = await setup();
     const response = await server.inject({ method: 'GET', url: '/api/tasks/nonexistent' });
