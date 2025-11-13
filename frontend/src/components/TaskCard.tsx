@@ -15,6 +15,11 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onDelete, isDeleting }: TaskCardProps) {
   const handleDelete = () => {
+    if (isDeleting) return;
+
+    const confirmed = window.confirm(`Are you sure you want to delete "${task.title}"?`);
+    if (!confirmed) return;
+
     onDelete(task.id);
   };
 
@@ -30,8 +35,17 @@ export function TaskCard({ task, onDelete, isDeleting }: TaskCardProps) {
             className="task-card__delete"
             onClick={handleDelete}
             disabled={isDeleting}
+            aria-label={`Delete task "${task.title}"`}
+            title={`Delete task "${task.title}"`}
           >
-            {isDeleting ? 'Deleting…' : 'Delete'}
+            {isDeleting ? (
+              <>
+                <span className="task-card__spinner" aria-hidden="true" />
+                <span className="task-card__delete-text">Deleting…</span>
+              </>
+            ) : (
+              <span className="task-card__delete-text">Delete</span>
+            )}
           </button>
           <span className="task-card__assignee" title={task.assignee ?? 'Unassigned'}>
             {getInitials(task.assignee)}
