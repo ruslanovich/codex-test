@@ -33,6 +33,44 @@ a {
   margin-bottom: 2rem;
 }
 
+.app__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app__add-task-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  background: var(--accent, #2563eb);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.app__add-task-button:hover {
+  background: var(--accent-strong, #1d4ed8);
+  box-shadow: 0 16px 30px rgba(29, 78, 216, 0.25);
+  transform: translateY(-1px);
+}
+
+.app__add-task-button:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(29, 78, 216, 0.2);
+}
+
+.app__alert {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #15803d;
+  font-weight: 600;
+}
+
 .app__subtitle {
   margin: 0;
   color: var(--text-secondary);

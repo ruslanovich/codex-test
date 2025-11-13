@@ -1,6 +1,17 @@
 import type { Task } from '../types.js';
 import type { TaskFilterState } from '../components/TaskFilters.js';
 
+export interface CreateTaskPayload {
+  title: string;
+  description?: string;
+  status?: Task['status'];
+  priority?: Task['priority'];
+  assignee?: Task['assignee'];
+  dueDate?: Task['dueDate'];
+  tags?: Task['tags'];
+  archived?: Task['archived'];
+}
+
 export async function fetchTasks(filters: TaskFilterState): Promise<Task[]> {
   const params = new URLSearchParams();
   if (filters.status && filters.status !== 'ALL') {
@@ -18,5 +29,27 @@ export async function fetchTasks(filters: TaskFilterState): Promise<Task[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch tasks');
   }
+  return response.json();
+}
+
+export async function createTask(payload: CreateTaskPayload): Promise<Task> {
+  const body = JSON.stringify(
+    Object.fromEntries(
+      Object.entries(payload).filter(([, value]) => value !== undefined),
+    ),
+  );
+
+  const response = await fetch('/api/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create task');
+  }
+
   return response.json();
 }
