@@ -5,7 +5,7 @@ import './TaskBoard.css';
 export interface TaskBoardProps {
   tasks: Task[];
   isLoading?: boolean;
-  onDeleteTask: (taskId: string) => void;
+  onDelete: (taskId: string) => void;
   isDeleting?: boolean;
   deletingTaskId?: string | null;
 }
@@ -18,7 +18,7 @@ const STATUSES = [
 
 type Status = (typeof STATUSES)[number]['id'];
 
-export function TaskBoard({ tasks, isLoading, onDeleteTask, isDeleting, deletingTaskId }: TaskBoardProps) {
+export function TaskBoard({ tasks, isLoading, onDelete, isDeleting, deletingTaskId }: TaskBoardProps) {
   return (
     <section className="task-board">
       {STATUSES.map((column) => (
@@ -27,7 +27,7 @@ export function TaskBoard({ tasks, isLoading, onDeleteTask, isDeleting, deleting
           status={column.title}
           tasks={tasks.filter((task) => task.status === (column.id as Status))}
           isLoading={isLoading}
-          onDeleteTask={onDeleteTask}
+          onDelete={onDelete}
           isDeleting={isDeleting}
           deletingTaskId={deletingTaskId}
         />

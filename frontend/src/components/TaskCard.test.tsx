@@ -1,9 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TaskCard } from './TaskCard.js';
 import type { Task } from '../types.js';
 
 describe('TaskCard', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   const task: Task = {
     id: '1',
     title: 'Design layout',
@@ -21,5 +26,32 @@ describe('TaskCard', () => {
     render(<TaskCard task={task} onDelete={() => {}} />);
     expect(screen.getByRole('heading', { name: 'Design layout' })).toBeInTheDocument();
     expect(screen.getByText('HIGH')).toBeInTheDocument();
+  });
+
+  it('shows a delete button and confirms before deleting', async () => {
+    const user = userEvent.setup();
+    const handleDelete = vi.fn();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    render(<TaskCard task={task} onDelete={handleDelete} />);
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete task "Design layout"' });
+    await user.click(deleteButton);
+
+    expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to delete "Design layout"?');
+    expect(handleDelete).toHaveBeenCalledWith('1');
+  });
+
+  it('does not delete when confirmation is cancelled', async () => {
+    const user = userEvent.setup();
+    const handleDelete = vi.fn();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    render(<TaskCard task={task} onDelete={handleDelete} />);
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete task "Design layout"' });
+    await user.click(deleteButton);
+
+    expect(handleDelete).not.toHaveBeenCalled();
   });
 });

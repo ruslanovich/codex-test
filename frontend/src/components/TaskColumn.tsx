@@ -6,12 +6,12 @@ interface TaskColumnProps {
   status: string;
   tasks: Task[];
   isLoading?: boolean;
-  onDeleteTask: (taskId: string) => void;
+  onDelete: (taskId: string) => void;
   isDeleting?: boolean;
   deletingTaskId?: string | null;
 }
 
-export function TaskColumn({ status, tasks, isLoading, onDeleteTask, isDeleting, deletingTaskId }: TaskColumnProps) {
+export function TaskColumn({ status, tasks, isLoading, onDelete, isDeleting, deletingTaskId }: TaskColumnProps) {
   return (
     <article className="task-column">
       <header className="task-column__header">
@@ -28,7 +28,7 @@ export function TaskColumn({ status, tasks, isLoading, onDeleteTask, isDeleting,
             <li key={task.id}>
               <TaskCard
                 task={task}
-                onDelete={onDeleteTask}
+                onDelete={onDelete}
                 isDeleting={isDeleting && deletingTaskId === task.id}
               />
             </li>

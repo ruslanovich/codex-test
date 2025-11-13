@@ -121,7 +121,7 @@ export default function App() {
         <TaskBoard
           tasks={tasksQuery.data ?? []}
           isLoading={tasksQuery.isLoading}
-          onDeleteTask={handleDeleteTask}
+          onDelete={handleDeleteTask}
           isDeleting={deleteTaskMutation.isPending}
           deletingTaskId={deleteTaskMutation.variables ?? null}
         />

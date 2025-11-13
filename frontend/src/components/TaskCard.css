@@ -71,17 +71,41 @@
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
-.task-card__delete:hover:not(:disabled) {
+.task-card__delete:hover:not(:disabled),
+.task-card__delete:focus-visible {
   background: rgba(248, 113, 113, 0.15);
   color: #b91c1c;
+}
+
+.task-card__delete:focus-visible {
+  outline: 2px solid rgba(248, 113, 113, 0.5);
+  outline-offset: 2px;
 }
 
 .task-card__delete:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.task-card__spinner {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: task-card-spin 0.6s linear infinite;
+}
+
+@keyframes task-card-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .task-card__title {
