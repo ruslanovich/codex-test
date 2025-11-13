@@ -64,17 +64,46 @@
 }
 
 .task-card__action {
-  background: none;
-  border: none;
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.35);
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+[data-theme='dark'] .task-card__action {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(209, 213, 219, 0.25);
+}
+
+.task-card__action--primary {
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme='dark'] .task-card__action--primary {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+.task-card__action--danger {
+  color: #b91c1c;
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+[data-theme='dark'] .task-card__action--danger {
+  background: rgba(248, 113, 113, 0.28);
+  border-color: rgba(248, 113, 113, 0.45);
 }
 .task-card__action:disabled {
   opacity: 0.6;
@@ -83,28 +112,20 @@
 
 .task-card__action--primary:hover:not(:disabled),
 .task-card__action--primary:focus-visible {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.55);
   color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .task-card__action--danger:hover:not(:disabled),
 .task-card__action--danger:focus-visible {
-  background: rgba(248, 113, 113, 0.15);
+  background: rgba(248, 113, 113, 0.32);
+  border-color: rgba(248, 113, 113, 0.55);
   color: #b91c1c;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
 }
 
-.task-card__action--primary:focus-visible,
-.task-card__action--danger:focus-visible {
-  outline-offset: 2px;
-}
-
-.task-card__action--primary:focus-visible {
-  outline: 2px solid rgba(59, 130, 246, 0.4);
-}
-
-.task-card__action--danger:focus-visible {
-  outline: 2px solid rgba(248, 113, 113, 0.5);
-}
 
 .task-card__spinner {
   width: 0.75rem;
