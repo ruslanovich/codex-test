@@ -36,3 +36,11 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
 
   return response.json();
 }
+
+export async function deleteTask(id: string): Promise<void> {
+  const response = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+
+  if (response.status !== 204) {
+    throw new Error('Failed to delete task');
+  }
+}

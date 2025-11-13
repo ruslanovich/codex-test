@@ -6,9 +6,12 @@ interface TaskColumnProps {
   status: string;
   tasks: Task[];
   isLoading?: boolean;
+  onDeleteTask: (taskId: string) => void;
+  isDeleting?: boolean;
+  deletingTaskId?: string | null;
 }
 
-export function TaskColumn({ status, tasks, isLoading }: TaskColumnProps) {
+export function TaskColumn({ status, tasks, isLoading, onDeleteTask, isDeleting, deletingTaskId }: TaskColumnProps) {
   return (
     <article className="task-column">
       <header className="task-column__header">
@@ -23,7 +26,11 @@ export function TaskColumn({ status, tasks, isLoading }: TaskColumnProps) {
         <ul className="task-column__list">
           {tasks.map((task) => (
             <li key={task.id}>
-              <TaskCard task={task} />
+              <TaskCard
+                task={task}
+                onDelete={onDeleteTask}
+                isDeleting={isDeleting && deletingTaskId === task.id}
+              />
             </li>
           ))}
         </ul>

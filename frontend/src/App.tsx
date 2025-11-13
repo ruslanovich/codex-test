@@ -5,7 +5,7 @@ import { TaskFilters, type TaskFilterState } from './components/TaskFilters.js';
 import { useTasks } from './hooks/useTasks.js';
 import { ThemeToggle } from './components/ThemeToggle.js';
 import { AddTaskDialog, type AddTaskDialogValues } from './components/AddTaskDialog.js';
-import { createTask } from './api/tasks.js';
+import { createTask, deleteTask } from './api/tasks.js';
 import type { CreateTaskInput } from './types.js';
 import './styles/theme.css';
 
@@ -19,18 +19,29 @@ const DEFAULT_FILTERS: TaskFilterState = {
 export default function App() {
   const [filters, setFilters] = useState<TaskFilterState>(DEFAULT_FILTERS);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
-  const [creationError, setCreationError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const tasksQuery = useTasks(filters);
 
   const createTaskMutation = useMutation({
     mutationFn: createTask,
     onSuccess: () => {
-      setCreationError(null);
+      setErrorMessage(null);
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
     onError: () => {
-      setCreationError('Failed to create task. Please try again.');
+      setErrorMessage('Failed to create task. Please try again.');
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: deleteTask,
+    onSuccess: () => {
+      setErrorMessage(null);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+    onError: () => {
+      setErrorMessage('Failed to delete task. Please try again.');
     },
   });
 
@@ -42,7 +53,7 @@ export default function App() {
   }, []);
 
   const handleOpenAddTask = () => {
-    setCreationError(null);
+    setErrorMessage(null);
     setIsAddTaskOpen(true);
   };
 
@@ -61,16 +72,21 @@ export default function App() {
       tags: values.tags,
     };
 
-    setCreationError(null);
+    setErrorMessage(null);
     createTaskMutation.mutate(payload, {
       onSuccess: () => {
         handleCloseAddTask();
       },
       onError: () => {
-        setCreationError('Failed to create task. Please try again.');
+        setErrorMessage('Failed to create task. Please try again.');
         setIsAddTaskOpen(true);
       },
     });
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setErrorMessage(null);
+    deleteTaskMutation.mutate(id);
   };
 
   const addTaskSubmitLabel = useMemo(
@@ -96,13 +112,19 @@ export default function App() {
         </div>
       </header>
       <main>
-        {creationError ? (
+        {errorMessage ? (
           <div className="app__error" role="alert">
-            {creationError}
+            {errorMessage}
           </div>
         ) : null}
         <TaskFilters filters={filters} onChange={setFilters} />
-        <TaskBoard tasks={tasksQuery.data ?? []} isLoading={tasksQuery.isLoading} />
+        <TaskBoard
+          tasks={tasksQuery.data ?? []}
+          isLoading={tasksQuery.isLoading}
+          onDeleteTask={handleDeleteTask}
+          isDeleting={deleteTaskMutation.isPending}
+          deletingTaskId={deleteTaskMutation.variables ?? null}
+        />
       </main>
       <AddTaskDialog
         open={isAddTaskOpen}
