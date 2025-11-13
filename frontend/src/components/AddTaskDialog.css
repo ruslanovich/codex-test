@@ -1,0 +1,103 @@
+.add-task-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  z-index: 1000;
+}
+
+.add-task-dialog__content {
+  width: min(520px, 100%);
+  background: var(--surface-elevated, #ffffff);
+  color: var(--text-primary);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.add-task-dialog__content h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.add-task-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.add-task-dialog__field label {
+  font-weight: 600;
+}
+
+.add-task-dialog__field input,
+.add-task-dialog__field textarea,
+.add-task-dialog__field select {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 0.5rem;
+  background: var(--surface-background);
+  color: inherit;
+}
+
+.add-task-dialog__field textarea {
+  resize: vertical;
+}
+
+.add-task-dialog__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.add-task-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.add-task-dialog__actions button {
+  font: inherit;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-task-dialog__actions button[type='button'] {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-secondary);
+}
+
+.add-task-dialog__actions button[type='button']:hover {
+  border-color: rgba(148, 163, 184, 0.8);
+}
+
+.add-task-dialog__actions button[type='submit'] {
+  background: var(--accent-primary, #2563eb);
+  color: #ffffff;
+}
+
+.add-task-dialog__actions button[type='submit']:hover {
+  background: var(--accent-primary-strong, #1d4ed8);
+}
+
+@media (max-width: 600px) {
+  .add-task-dialog__content {
+    padding: 1.5rem;
+  }
+
+  .add-task-dialog__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

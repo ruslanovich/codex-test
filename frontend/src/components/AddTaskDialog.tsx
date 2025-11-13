@@ -1,5 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useId, useMemo, useState } from 'react';
+import './AddTaskDialog.css';
 import type { TaskPriority, TaskStatus } from '../types.js';
 
 export interface AddTaskDialogValues {
