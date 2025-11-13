@@ -18,7 +18,7 @@ describe('TaskCard', () => {
   };
 
   it('renders task title and priority', () => {
-    render(<TaskCard task={task} />);
+    render(<TaskCard task={task} onDelete={() => {}} />);
     expect(screen.getByRole('heading', { name: 'Design layout' })).toBeInTheDocument();
     expect(screen.getByText('HIGH')).toBeInTheDocument();
   });
