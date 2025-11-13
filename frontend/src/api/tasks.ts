@@ -1,4 +1,4 @@
-import type { Task } from '../types.js';
+import type { CreateTaskInput, Task } from '../types.js';
 import type { TaskFilterState } from '../components/TaskFilters.js';
 
 export async function fetchTasks(filters: TaskFilterState): Promise<Task[]> {
@@ -18,5 +18,21 @@ export async function fetchTasks(filters: TaskFilterState): Promise<Task[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch tasks');
   }
+  return response.json();
+}
+
+export async function createTask(input: CreateTaskInput): Promise<Task> {
+  const response = await fetch('/api/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create task');
+  }
+
   return response.json();
 }
