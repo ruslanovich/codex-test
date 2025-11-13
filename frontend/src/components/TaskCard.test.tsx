@@ -23,7 +23,7 @@ describe('TaskCard', () => {
   };
 
   it('renders task title and priority', () => {
-    render(<TaskCard task={task} onDelete={() => {}} />);
+    render(<TaskCard task={task} onDelete={() => {}} onEdit={() => {}} />);
     expect(screen.getByRole('heading', { name: 'Design layout' })).toBeInTheDocument();
     expect(screen.getByText('HIGH')).toBeInTheDocument();
   });
@@ -33,7 +33,7 @@ describe('TaskCard', () => {
     const handleDelete = vi.fn();
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-    render(<TaskCard task={task} onDelete={handleDelete} />);
+    render(<TaskCard task={task} onDelete={handleDelete} onEdit={vi.fn()} />);
 
     const deleteButton = screen.getByRole('button', { name: 'Delete task "Design layout"' });
     await user.click(deleteButton);
@@ -47,7 +47,7 @@ describe('TaskCard', () => {
     const handleDelete = vi.fn();
     vi.spyOn(window, 'confirm').mockReturnValue(false);
 
-    render(<TaskCard task={task} onDelete={handleDelete} />);
+    render(<TaskCard task={task} onDelete={handleDelete} onEdit={vi.fn()} />);
 
     const deleteButton = screen.getByRole('button', { name: 'Delete task "Design layout"' });
     await user.click(deleteButton);
