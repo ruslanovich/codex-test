@@ -5,8 +5,9 @@ import { TaskFilters, type TaskFilterState } from './components/TaskFilters.js';
 import { useTasks } from './hooks/useTasks.js';
 import { ThemeToggle } from './components/ThemeToggle.js';
 import { AddTaskDialog, type AddTaskDialogValues } from './components/AddTaskDialog.js';
-import { createTask, deleteTask } from './api/tasks.js';
-import type { CreateTaskInput } from './types.js';
+import { createTask, deleteTask, updateTask } from './api/tasks.js';
+import { readStoredTheme } from './utils/themePreference.js';
+import type { CreateTaskInput, Task, UpdateTaskInput } from './types.js';
 import './styles/theme.css';
 
 const DEFAULT_FILTERS: TaskFilterState = {
@@ -16,9 +17,52 @@ const DEFAULT_FILTERS: TaskFilterState = {
   theme: 'light',
 };
 
+const mapTaskToDialogValues = (task: Task): AddTaskDialogValues => ({
+  title: task.title,
+  description: task.description ?? '',
+  status: task.status,
+  priority: task.priority,
+  assignee: task.assignee ?? '',
+  dueDate: task.dueDate ?? '',
+  tags: [...task.tags],
+});
+
+const createTaskPayload = (values: AddTaskDialogValues): CreateTaskInput => {
+  const trimmedTitle = values.title.trim();
+  const trimmedDescription = values.description.trim();
+  const trimmedAssignee = values.assignee.trim();
+
+  return {
+    title: trimmedTitle,
+    description: trimmedDescription ? trimmedDescription : undefined,
+    status: values.status,
+    priority: values.priority,
+    assignee: trimmedAssignee ? trimmedAssignee : undefined,
+    dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
+    tags: values.tags,
+  };
+};
+
+const updateTaskPayload = (values: AddTaskDialogValues): UpdateTaskInput => {
+  const trimmedTitle = values.title.trim();
+  const trimmedDescription = values.description.trim();
+  const trimmedAssignee = values.assignee.trim();
+
+  return {
+    title: trimmedTitle,
+    description: trimmedDescription ? trimmedDescription : null,
+    status: values.status,
+    priority: values.priority,
+    assignee: trimmedAssignee ? trimmedAssignee : null,
+    dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : null,
+    tags: values.tags,
+  };
+};
+
 export default function App() {
   const [filters, setFilters] = useState<TaskFilterState>(DEFAULT_FILTERS);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const tasksQuery = useTasks(filters);
@@ -45,9 +89,20 @@ export default function App() {
     },
   });
 
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: UpdateTaskInput }) => updateTask(id, input),
+    onSuccess: () => {
+      setErrorMessage(null);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+    onError: () => {
+      setErrorMessage('Failed to update task. Please try again.');
+    },
+  });
+
   useEffect(() => {
-    const stored = localStorage.getItem('task-board-theme');
-    if (stored === 'light' || stored === 'dark') {
+    const stored = readStoredTheme();
+    if (stored) {
       setFilters((prev) => ({ ...prev, theme: stored }));
     }
   }, []);
@@ -61,16 +116,17 @@ export default function App() {
     setIsAddTaskOpen(false);
   };
 
+  const handleOpenEditTask = (task: Task) => {
+    setErrorMessage(null);
+    setEditingTask(task);
+  };
+
+  const handleCloseEditTask = () => {
+    setEditingTask(null);
+  };
+
   const handleAddTaskSubmit = (values: AddTaskDialogValues) => {
-    const payload: CreateTaskInput = {
-      title: values.title,
-      description: values.description?.trim() ? values.description.trim() : undefined,
-      status: values.status,
-      priority: values.priority,
-      assignee: values.assignee?.trim() ? values.assignee.trim() : undefined,
-      dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
-      tags: values.tags,
-    };
+    const payload = createTaskPayload(values);
 
     setErrorMessage(null);
     createTaskMutation.mutate(payload, {
@@ -84,6 +140,29 @@ export default function App() {
     });
   };
 
+  const handleEditTaskSubmit = (values: AddTaskDialogValues) => {
+    if (!editingTask) {
+      return;
+    }
+
+    const currentTask = editingTask;
+    const payload = updateTaskPayload(values);
+
+    setErrorMessage(null);
+    updateTaskMutation.mutate(
+      { id: currentTask.id, input: payload },
+      {
+        onSuccess: () => {
+          handleCloseEditTask();
+        },
+        onError: () => {
+          setErrorMessage('Failed to update task. Please try again.');
+          setEditingTask(currentTask);
+        },
+      },
+    );
+  };
+
   const handleDeleteTask = (id: string) => {
     setErrorMessage(null);
     deleteTaskMutation.mutate(id);
@@ -92,6 +171,16 @@ export default function App() {
   const addTaskSubmitLabel = useMemo(
     () => (createTaskMutation.isPending ? 'Adding…' : 'Add task'),
     [createTaskMutation.isPending],
+  );
+
+  const editTaskSubmitLabel = useMemo(
+    () => (updateTaskMutation.isPending ? 'Saving…' : 'Save changes'),
+    [updateTaskMutation.isPending],
+  );
+
+  const editDialogInitialValues = useMemo(
+    () => (editingTask ? mapTaskToDialogValues(editingTask) : undefined),
+    [editingTask],
   );
 
   return (
@@ -122,6 +211,7 @@ export default function App() {
           tasks={tasksQuery.data ?? []}
           isLoading={tasksQuery.isLoading}
           onDelete={handleDeleteTask}
+          onEdit={handleOpenEditTask}
           isDeleting={deleteTaskMutation.isPending}
           deletingTaskId={deleteTaskMutation.variables ?? null}
         />
@@ -132,6 +222,16 @@ export default function App() {
         onSubmit={handleAddTaskSubmit}
         submitLabel={addTaskSubmitLabel}
       />
+      {editingTask ? (
+        <AddTaskDialog
+          open={Boolean(editingTask)}
+          onClose={handleCloseEditTask}
+          onSubmit={handleEditTaskSubmit}
+          initialValues={editDialogInitialValues}
+          submitLabel={editTaskSubmitLabel}
+          title="Edit Task"
+        />
+      ) : null}
     </div>
   );
 }

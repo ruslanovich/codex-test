@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TaskCard } from './TaskCard.js';
 import type { Task } from '../types.js';
+import { setupUser } from '../test/setupUser.js';
 
 describe('TaskCard', () => {
   afterEach(() => {
@@ -29,7 +29,7 @@ describe('TaskCard', () => {
   });
 
   it('shows a delete button and confirms before deleting', async () => {
-    const user = userEvent.setup();
+    const user = setupUser();
     const handleDelete = vi.fn();
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
@@ -43,7 +43,7 @@ describe('TaskCard', () => {
   });
 
   it('does not delete when confirmation is cancelled', async () => {
-    const user = userEvent.setup();
+    const user = setupUser();
     const handleDelete = vi.fn();
     vi.spyOn(window, 'confirm').mockReturnValue(false);
 

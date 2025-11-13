@@ -26,3 +26,12 @@ export interface CreateTaskInput {
   tags?: string[];
   archived?: boolean;
 }
+
+export interface UpdateTaskInput extends Partial<CreateTaskInput> {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  order?: number;
+  description?: string | null;
+  assignee?: string | null;
+  dueDate?: string | null;
+}

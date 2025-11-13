@@ -18,6 +18,9 @@ export const updateTaskSchema = createTaskSchema.partial().extend({
   status: taskStatusSchema.optional(),
   priority: taskPrioritySchema.optional(),
   order: z.number().int().nonnegative().optional(),
+  description: z.string().optional().nullable(),
+  assignee: z.string().optional().nullable(),
+  dueDate: z.string().datetime().optional().nullable(),
 });
 
 export const taskQuerySchema = z.object({

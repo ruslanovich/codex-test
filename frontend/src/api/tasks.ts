@@ -1,4 +1,4 @@
-import type { CreateTaskInput, Task } from '../types.js';
+import type { CreateTaskInput, Task, UpdateTaskInput } from '../types.js';
 import type { TaskFilterState } from '../components/TaskFilters.js';
 
 export async function fetchTasks(filters: TaskFilterState): Promise<Task[]> {
@@ -43,4 +43,20 @@ export async function deleteTask(id: string): Promise<void> {
   if (response.status !== 204) {
     throw new Error('Failed to delete task');
   }
+}
+
+export async function updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
+  const response = await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update task');
+  }
+
+  return response.json();
 }

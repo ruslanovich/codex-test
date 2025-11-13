@@ -19,8 +19,9 @@ export async function buildServer() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = Number(process.env.PORT ?? 4000);
+  const host = process.env.HOST ?? '0.0.0.0';
   buildServer()
-    .then((server) => server.listen({ port, host: '0.0.0.0' }))
+    .then((server) => server.listen({ port, host }))
     .catch((error) => {
       console.error(error);
       process.exit(1);
